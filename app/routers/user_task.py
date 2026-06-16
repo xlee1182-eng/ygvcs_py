@@ -1,0 +1,126 @@
+"""UserTask REST API (실작업 조회/취소/초기화).
+
+원본 UserTaskWebService(@RequestMapping /service/web/userTask) 의 DB 기반 엔드포인트.
+sendTask/setTask/setKeyboardLock/sendRepeatTask 등 TCP 송신 의존부는 후속.
+"""
+from __future__ import annotations
+
+import logging
+
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.database import get_db
+from app.core.jsonresult import JsonResult
+from app.schemas.task import (
+    KeyboardLockSetForm,
+    TaskCancelForm,
+    TaskClearForm,
+    TaskRepeatSendForm,
+    TaskSetForm,
+    TaskStateGetForm,
+    WebTaskAddForm,
+)
+from app.services.user_task import user_task_service
+
+LOGGER = logging.getLogger('app')
+
+# router = APIRouter(prefix="/service/web/userTask", tags=["用户任务(web)"])
+router = APIRouter(prefix="/service/web/userTask", tags=["사용자 작업(web)"])
+
+
+@router.post("/sendTask", response_model=JsonResult)
+async def send_task(form: WebTaskAddForm, db: AsyncSession = Depends(get_db)) -> JsonResult:
+    """원본 sendTask: 외부 작업 송신(addTask)."""
+    try:
+        msg = form.check()
+        if not msg.is_success():
+            from app.core import messages
+            return msg.set_result_msg(f"【{msg.resultMsg}】{messages.get_msg('api.paramNotEmpty')}")
+        return await user_task_service.add_task(db, form)
+    except Exception:
+        # LOGGER.exception("发送任务(对外)接口出现异常！")
+        LOGGER.exception("작업 전송(외부) 인터페이스 예외 발생!")
+        return JsonResult.syserr()
+
+
+@router.post("/getTaskResult", response_model=JsonResult)
+async def get_task_result(form: TaskStateGetForm, db: AsyncSession = Depends(get_db)) -> JsonResult:
+    try:
+        return await user_task_service.get_task_result(db, form.customerId, form.messageId)
+    except Exception:
+        # LOGGER.exception("获取任务状态(对外)接口出现异常！")
+        LOGGER.exception("작업 상태 조회(외부) 인터페이스 예외 발생!")
+        return JsonResult.syserr()
+
+
+@router.post("/getPickPlaceState", response_model=JsonResult)
+async def get_pick_place_state(form: TaskStateGetForm, db: AsyncSession = Depends(get_db)) -> JsonResult:
+    try:
+        return await user_task_service.get_pick_place_state(db, form.customerId, form.messageId)
+    except Exception:
+        # LOGGER.exception("查询取放货状态(对外)接口出现异常！")
+        LOGGER.exception("화물 취득/적재 상태 조회(외부) 인터페이스 예외 발생!")
+        return JsonResult.syserr()
+
+
+@router.post("/cancelTask", response_model=JsonResult)
+async def cancel_task(form: TaskCancelForm, db: AsyncSession = Depends(get_db)) -> JsonResult:
+    try:
+        return await user_task_service.cancel_task(db, form.deviceImei)
+    except Exception:
+        # LOGGER.exception("取消所有未执行的任务(对外)接口出现异常！")
+        LOGGER.exception("미실행 전체 작업 취소(외부) 인터페이스 예외 발생!")
+        return JsonResult.syserr()
+
+
+@router.post("/clearTask", response_model=JsonResult)
+async def clear_task(form: TaskClearForm, db: AsyncSession = Depends(get_db)) -> JsonResult:
+    try:
+        return await user_task_service.clear_task(db)
+    except Exception:
+        # LOGGER.exception("清空所有任务(对外)接口出现异常！")
+        LOGGER.exception("전체 작업 초기화(외부) 인터페이스 예외 발생!")
+        return JsonResult.syserr()
+
+
+@router.post("/setKeyboardLock", response_model=JsonResult)
+async def set_keyboard_lock(form: KeyboardLockSetForm, db: AsyncSession = Depends(get_db)) -> JsonResult:
+    try:
+        msg = form.check()
+        if not msg.is_success():
+            from app.core import messages
+            return msg.set_result_msg(f"【{msg.resultMsg}】{messages.get_msg('api.paramNotEmpty')}")
+        return await user_task_service.set_keyboard_lock(db, form)
+    except Exception:
+        # LOGGER.exception("设置键盘任务锁(对外)接口出现异常！")
+        LOGGER.exception("키보드 작업 잠금 설정(외부) 인터페이스 예외 발생!")
+        return JsonResult.syserr()
+
+
+@router.post("/setTask", response_model=JsonResult)
+async def set_task(form: TaskSetForm, db: AsyncSession = Depends(get_db)) -> JsonResult:
+    try:
+        msg = form.check()
+        if not msg.is_success():
+            from app.core import messages
+            return msg.set_result_msg(f"【{msg.resultMsg}】{messages.get_msg('api.paramNotEmpty')}")
+        return await user_task_service.set_task(db, form)
+    except Exception:
+        # LOGGER.exception("设置任务(对外)接口出现异常！")
+        LOGGER.exception("작업 설정(외부) 인터페이스 예외 발생!")
+        return JsonResult.syserr()
+
+
+@router.post("/sendRepeatTask", response_model=JsonResult)
+async def send_repeat_task(form: TaskRepeatSendForm, db: AsyncSession = Depends(get_db)) -> JsonResult:
+    try:
+        msg = form.check()
+        if not msg.is_success():
+            from app.core import messages
+            return msg.set_result_msg(f"【{msg.resultMsg}】{messages.get_msg('api.paramNotEmpty')}")
+        return await user_task_service.send_repeat_task(db, form)
+    except Exception:
+        # LOGGER.exception("重复发送任务(对外)接口出现异常！")
+        LOGGER.exception("작업 반복 전송(외부) 인터페이스 예외 발생!")
+        return JsonResult.syserr()

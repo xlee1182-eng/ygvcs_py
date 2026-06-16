@@ -1,0 +1,155 @@
+[2026-06-12 17:05:10][INFO][main.py:_check_redis:28] [Redis] 연결 시도 중... localhost:6379  db=3
+[2026-06-12 17:05:12][INFO][main.py:_check_redis:39] [Redis] 연결 OK
+[2026-06-12 17:05:14][INFO][main.py:_init_redis_data:57] [Redis 초기화] communication_key = 123456789
+[2026-06-12 17:05:16][INFO][main.py:_init_redis_data:66] [Redis 초기화] forklift_all  (0건)
+[2026-06-12 17:05:16][INFO][main.py:_init_redis_data:72] [Redis 초기화] serverIsReady = yes
+[2026-06-12 17:05:16][INFO][frame_server.py:start:29] PrimaryServer 시작, 포트: 9112
+[2026-06-12 17:05:16][INFO][scheduler.py:start_scheduler:28] 스케줄러 시작 (record_heart 5s)
+[2026-06-12 17:11:57][INFO][server.py:_serve:92] Started server process [30892]
+[2026-06-12 17:11:57][INFO][on.py:startup:48] Waiting for application startup.
+[2026-06-12 17:11:57][INFO][main.py:_check_redis:34] [Redis] 연결 시도 중... localhost:6379  db=3
+[2026-06-12 17:11:59][INFO][main.py:_check_redis:45] [Redis] 연결 OK
+[2026-06-12 17:12:01][INFO][main.py:_init_redis_data:63] [Redis 초기화] communication_key = 123456789
+[2026-06-12 17:12:03][INFO][main.py:_init_redis_data:72] [Redis 초기화] forklift_all  (0건)
+[2026-06-12 17:12:03][INFO][main.py:_init_redis_data:78] [Redis 초기화] serverIsReady = yes
+[2026-06-12 17:12:03][INFO][frame_server.py:start:29] PrimaryServer 시작, 포트: 9112
+[2026-06-12 17:12:03][INFO][scheduler.py:start_scheduler:28] 스케줄러 시작 (record_heart 5s)
+[2026-06-12 17:12:03][INFO][on.py:startup:62] Application startup complete.
+[2026-06-12 17:12:03][INFO][server.py:_log_started_message:224] Uvicorn running on http://127.0.0.1:8188 (Press CTRL+C to quit)
+[2026-06-12 17:19:10][INFO][server.py:shutdown:272] Shutting down
+[2026-06-12 17:19:10][INFO][on.py:shutdown:67] Waiting for application shutdown.
+[2026-06-12 17:19:40][INFO][on.py:shutdown:76] Application shutdown complete.
+[2026-06-12 17:19:40][INFO][server.py:_serve:102] Finished server process [30892]
+[2026-06-12 17:21:00][INFO][server.py:_serve:92] Started server process [17340]
+[2026-06-12 17:21:00][INFO][on.py:startup:48] Waiting for application startup.
+[2026-06-12 17:21:00][INFO][main.py:_check_redis:34] [Redis] 연결 시도 중... localhost:6379  db=3
+[2026-06-12 17:21:02][INFO][main.py:_check_redis:45] [Redis] 연결 OK
+[2026-06-12 17:21:04][INFO][main.py:_init_redis_data:63] [Redis 초기화] communication_key = 123456789
+[2026-06-12 17:21:06][INFO][main.py:_init_redis_data:72] [Redis 초기화] forklift_all  (0건)
+[2026-06-12 17:21:06][INFO][main.py:_init_redis_data:78] [Redis 초기화] serverIsReady = yes
+[2026-06-12 17:21:06][INFO][frame_server.py:start:29] PrimaryServer 시작, 포트: 9112
+[2026-06-12 17:21:06][INFO][scheduler.py:start_scheduler:28] 스케줄러 시작 (record_heart 5s)
+[2026-06-12 17:21:06][INFO][on.py:startup:62] Application startup complete.
+[2026-06-12 17:21:06][INFO][server.py:_log_started_message:224] Uvicorn running on http://127.0.0.1:8188 (Press CTRL+C to quit)
+[2026-06-12 17:27:02][INFO][server.py:shutdown:272] Shutting down
+[2026-06-12 17:27:02][INFO][on.py:shutdown:67] Waiting for application shutdown.
+[2026-06-12 17:27:02][INFO][on.py:shutdown:76] Application shutdown complete.
+[2026-06-12 17:27:02][INFO][server.py:_serve:102] Finished server process [17340]
+[2026-06-12 17:27:04][INFO][server.py:_serve:92] Started server process [11380]
+[2026-06-12 17:27:04][INFO][on.py:startup:48] Waiting for application startup.
+[2026-06-12 17:27:04][INFO][main.py:_check_redis:34] [Redis] 연결 시도 중... localhost:6379  db=3
+[2026-06-12 17:27:06][INFO][main.py:_check_redis:45] [Redis] 연결 OK
+[2026-06-12 17:27:08][INFO][main.py:_init_redis_data:63] [Redis 초기화] communication_key = 123456789
+[2026-06-12 17:27:10][INFO][main.py:_init_redis_data:72] [Redis 초기화] forklift_all  (0건)
+[2026-06-12 17:27:10][INFO][main.py:_init_redis_data:78] [Redis 초기화] serverIsReady = yes
+[2026-06-12 17:27:10][INFO][frame_server.py:start:29] PrimaryServer 시작, 포트: 9112
+[2026-06-12 17:27:10][INFO][scheduler.py:start_scheduler:28] 스케줄러 시작 (record_heart 5s)
+[2026-06-12 17:27:10][INFO][on.py:startup:62] Application startup complete.
+[2026-06-12 17:27:10][INFO][server.py:_log_started_message:224] Uvicorn running on http://127.0.0.1:8188 (Press CTRL+C to quit)
+[2026-06-12 17:28:09][INFO][server.py:shutdown:272] Shutting down
+[2026-06-12 17:28:09][INFO][on.py:shutdown:67] Waiting for application shutdown.
+[2026-06-12 17:28:09][INFO][on.py:shutdown:76] Application shutdown complete.
+[2026-06-12 17:28:09][INFO][server.py:_serve:102] Finished server process [11380]
+[2026-06-12 17:43:38][INFO][server.py:_serve:92] Started server process [35348]
+[2026-06-12 17:43:38][INFO][on.py:startup:48] Waiting for application startup.
+[2026-06-12 17:43:38][INFO][main.py:_check_redis:34] [Redis] 연결 시도 중... localhost:6379  db=3
+[2026-06-12 17:43:40][INFO][main.py:_check_redis:45] [Redis] 연결 OK
+[2026-06-12 17:43:42][INFO][main.py:_init_redis_data:63] [Redis 초기화] communication_key = 123456789
+[2026-06-12 17:43:44][INFO][main.py:_init_redis_data:72] [Redis 초기화] forklift_all  (0건)
+[2026-06-12 17:43:44][INFO][main.py:_init_redis_data:78] [Redis 초기화] serverIsReady = yes
+[2026-06-12 17:43:44][INFO][frame_server.py:start:29] PrimaryServer 시작, 포트: 9112
+[2026-06-12 17:43:44][INFO][scheduler.py:start_scheduler:28] 스케줄러 시작 (record_heart 5s)
+[2026-06-12 17:43:44][INFO][on.py:startup:62] Application startup complete.
+[2026-06-12 17:43:44][INFO][server.py:_log_started_message:224] Uvicorn running on http://0.0.0.0:8188 (Press CTRL+C to quit)
+[2026-06-12 17:43:54][INFO][httptools_impl.py:send:484] 127.0.0.1:51667 - "GET / HTTP/1.1" 404
+[2026-06-12 17:44:01][INFO][httptools_impl.py:send:484] 127.0.0.1:55258 - "GET /ygvcs/swagger-ui/ HTTP/1.1" 200
+[2026-06-12 17:44:01][INFO][httptools_impl.py:send:484] 127.0.0.1:55258 - "GET /ygvcs/v3/api-docs HTTP/1.1" 200
+[2026-06-12 17:49:31][INFO][server.py:shutdown:272] Shutting down
+[2026-06-12 17:49:31][INFO][on.py:shutdown:67] Waiting for application shutdown.
+[2026-06-12 17:49:31][INFO][on.py:shutdown:76] Application shutdown complete.
+[2026-06-12 17:49:31][INFO][server.py:_serve:102] Finished server process [35348]
+[2026-06-12 17:49:50][INFO][server.py:_serve:92] Started server process [35396]
+[2026-06-12 17:49:50][INFO][on.py:startup:48] Waiting for application startup.
+[2026-06-12 17:49:50][INFO][main.py:_check_redis:34] [Redis] 연결 시도 중... localhost:6379  db=2
+[2026-06-12 17:50:16][ERROR][main.py:_check_redis:47] [Redis] 연결 실패: Authentication required.
+[2026-06-12 17:51:09][INFO][server.py:_serve:92] Started server process [24216]
+[2026-06-12 17:51:09][INFO][on.py:startup:48] Waiting for application startup.
+[2026-06-12 17:51:09][INFO][main.py:_check_redis:34] [Redis] 연결 시도 중... localhost:6379  db=3
+[2026-06-12 17:51:11][INFO][main.py:_check_redis:45] [Redis] 연결 OK
+[2026-06-12 17:51:13][INFO][main.py:_init_redis_data:63] [Redis 초기화] communication_key = 123456789
+[2026-06-12 17:51:15][INFO][main.py:_init_redis_data:72] [Redis 초기화] forklift_all  (0건)
+[2026-06-12 17:51:15][INFO][main.py:_init_redis_data:78] [Redis 초기화] serverIsReady = yes
+[2026-06-12 17:51:15][INFO][frame_server.py:start:29] PrimaryServer 시작, 포트: 9112
+[2026-06-12 17:51:16][INFO][scheduler.py:start_scheduler:28] 스케줄러 시작 (record_heart 5s)
+[2026-06-12 17:51:16][INFO][on.py:startup:62] Application startup complete.
+[2026-06-12 17:51:16][INFO][server.py:_log_started_message:224] Uvicorn running on http://0.0.0.0:8188 (Press CTRL+C to quit)
+[2026-06-12 17:51:23][INFO][httptools_impl.py:send:484] 127.0.0.1:50635 - "GET /ygvcs/swagger-ui/ HTTP/1.1" 200
+[2026-06-12 17:51:23][INFO][httptools_impl.py:send:484] 127.0.0.1:50635 - "GET /ygvcs/v3/api-docs HTTP/1.1" 200
+[2026-06-12 17:51:26][INFO][httptools_impl.py:send:484] 127.0.0.1:50635 - "GET /ygvcs/swagger-ui/ HTTP/1.1" 200
+[2026-06-12 17:51:26][INFO][httptools_impl.py:send:484] 127.0.0.1:50635 - "GET /ygvcs/v3/api-docs HTTP/1.1" 200
+[2026-06-12 17:51:29][INFO][httptools_impl.py:send:484] 127.0.0.1:50635 - "GET /ygvcs/swagger-ui/ HTTP/1.1" 200
+[2026-06-12 17:51:29][INFO][httptools_impl.py:send:484] 127.0.0.1:50635 - "GET /ygvcs/v3/api-docs HTTP/1.1" 200
+[2026-06-12 17:51:45][INFO][server.py:shutdown:272] Shutting down
+[2026-06-12 17:51:45][INFO][on.py:shutdown:67] Waiting for application shutdown.
+[2026-06-12 17:51:45][INFO][on.py:shutdown:76] Application shutdown complete.
+[2026-06-12 17:51:45][INFO][server.py:_serve:102] Finished server process [24216]
+[2026-06-12 17:58:51][INFO][server.py:_serve:92] Started server process [33212]
+[2026-06-12 17:58:51][INFO][on.py:startup:48] Waiting for application startup.
+[2026-06-12 17:58:52][INFO][main.py:_check_redis:34] [Redis] 연결 시도 중... localhost:6379  db=3
+[2026-06-12 17:58:54][INFO][main.py:_check_redis:45] [Redis] 연결 OK
+[2026-06-12 17:58:56][INFO][main.py:_init_redis_data:63] [Redis 초기화] communication_key = 123456789
+[2026-06-12 17:58:58][INFO][main.py:_init_redis_data:72] [Redis 초기화] forklift_all  (0건)
+[2026-06-12 17:58:58][INFO][main.py:_init_redis_data:78] [Redis 초기화] serverIsReady = yes
+[2026-06-12 17:58:58][INFO][frame_server.py:start:29] PrimaryServer 시작, 포트: 9112
+[2026-06-12 17:58:58][INFO][scheduler.py:start_scheduler:28] 스케줄러 시작 (record_heart 5s)
+[2026-06-12 17:58:58][INFO][on.py:startup:62] Application startup complete.
+[2026-06-12 17:58:58][INFO][server.py:_log_started_message:224] Uvicorn running on http://0.0.0.0:8188 (Press CTRL+C to quit)
+[2026-06-12 17:58:58][INFO][httptools_impl.py:send:484] 127.0.0.1:55848 - "GET /ygvcs/swagger-ui/ HTTP/1.1" 200
+[2026-06-12 17:58:58][INFO][httptools_impl.py:send:484] 127.0.0.1:55848 - "GET /ygvcs/v3/api-docs HTTP/1.1" 200
+[2026-06-12 18:00:17][WARNING][device.py:get_agv_heart_list:92] 获取所有设备心跳接口入口,参数为：DeviceInfoForm({'userName': 'testAdmin', 'userId': 'string'})
+[2026-06-12 18:00:17][INFO][httptools_impl.py:send:484] 127.0.0.1:59274 - "POST /ygvcs/service/warp/device/getAgvHeartList HTTP/1.1" 200
+[2026-06-12 18:05:19][INFO][server.py:shutdown:272] Shutting down
+[2026-06-12 18:05:19][INFO][on.py:shutdown:67] Waiting for application shutdown.
+[2026-06-12 18:05:19][INFO][on.py:shutdown:76] Application shutdown complete.
+[2026-06-12 18:05:19][INFO][server.py:_serve:102] Finished server process [33212]
+[2026-06-12 18:07:30][INFO][server.py:_serve:92] Started server process [33352]
+[2026-06-12 18:07:30][INFO][on.py:startup:48] Waiting for application startup.
+[2026-06-12 18:07:30][INFO][main.py:_check_redis:34] [Redis] 연결 시도 중... localhost:6379  db=3
+[2026-06-12 18:07:32][INFO][main.py:_check_redis:45] [Redis] 연결 OK
+[2026-06-12 18:07:34][INFO][main.py:_init_redis_data:63] [Redis 초기화] communication_key = 123456789
+[2026-06-12 18:07:36][INFO][main.py:_init_redis_data:72] [Redis 초기화] forklift_all  (0건)
+[2026-06-12 18:07:36][INFO][main.py:_init_redis_data:78] [Redis 초기화] serverIsReady = yes
+[2026-06-12 18:07:36][INFO][frame_server.py:start:29] PrimaryServer 시작, 포트: 9112
+[2026-06-12 18:07:36][INFO][scheduler.py:start_scheduler:28] 스케줄러 시작 (record_heart 5s)
+[2026-06-12 18:07:36][INFO][on.py:startup:62] Application startup complete.
+[2026-06-12 18:07:36][INFO][server.py:_log_started_message:224] Uvicorn running on http://0.0.0.0:8188 (Press CTRL+C to quit)
+[2026-06-12 18:07:50][INFO][server.py:shutdown:272] Shutting down
+[2026-06-12 18:07:50][INFO][on.py:shutdown:67] Waiting for application shutdown.
+[2026-06-12 18:07:50][INFO][on.py:shutdown:76] Application shutdown complete.
+[2026-06-12 18:07:50][INFO][server.py:_serve:102] Finished server process [33352]
+[2026-06-12 18:07:52][INFO][server.py:_serve:92] Started server process [3360]
+[2026-06-12 18:07:52][INFO][on.py:startup:48] Waiting for application startup.
+[2026-06-12 18:07:52][INFO][main.py:_check_redis:34] [Redis] 연결 시도 중... localhost:6379  db=3
+[2026-06-12 18:07:54][INFO][main.py:_check_redis:45] [Redis] 연결 OK
+[2026-06-12 18:07:56][INFO][main.py:_init_redis_data:63] [Redis 초기화] communication_key = 123456789
+[2026-06-12 18:07:58][INFO][main.py:_init_redis_data:72] [Redis 초기화] forklift_all  (0건)
+[2026-06-12 18:07:58][INFO][main.py:_init_redis_data:78] [Redis 초기화] serverIsReady = yes
+[2026-06-12 18:07:58][INFO][frame_server.py:start:29] PrimaryServer 시작, 포트: 9112
+[2026-06-12 18:07:59][INFO][scheduler.py:start_scheduler:28] 스케줄러 시작 (record_heart 5s)
+[2026-06-12 18:07:59][INFO][on.py:startup:62] Application startup complete.
+[2026-06-12 18:07:59][INFO][server.py:_log_started_message:224] Uvicorn running on http://0.0.0.0:8188 (Press CTRL+C to quit)
+[2026-06-12 18:08:41][INFO][httptools_impl.py:send:484] 127.0.0.1:49168 - "GET /ygvcs/swagger-ui/ HTTP/1.1" 200
+[2026-06-12 18:08:41][INFO][httptools_impl.py:send:484] 127.0.0.1:49168 - "GET /ygvcs/v3/api-docs HTTP/1.1" 200
+[2026-06-12 18:09:28][WARNING][user.py:user_login:29] 用户登录接口入口,参数为：UserLoginForm(userName=string)
+[2026-06-12 18:09:30][WARNING][user.py:user_login:35] 用户登录接口返回帧：{'resultCode': '1', 'resultMsg': 'Username error!', 'data': None}
+[2026-06-12 18:09:30][INFO][httptools_impl.py:send:484] 127.0.0.1:50189 - "POST /ygvcs/service/warp/user/userLogin HTTP/1.1" 200
+[2026-06-12 18:11:07][WARNING][device.py:add_device:53] 新增设备接口入口,参数为：DeviceAddForm({'userName': 'abc', 'userId': '123', 'deviceImei': '20001', 'ipStr': '192.168.0.100', 'deviceName': 'agv01', 'type': '1', 'isEnable': 'y', 'codeAct': 'a', 'action': 'b'})
+[2026-06-12 18:11:09][INFO][httptools_impl.py:send:484] 127.0.0.1:64040 - "POST /ygvcs/service/warp/device/addDevice HTTP/1.1" 200
+[2026-06-12 18:11:35][WARNING][device.py:add_device:53] 新增设备接口入口,参数为：DeviceAddForm({'userName': 'abc', 'userId': '123', 'deviceImei': '20001', 'ipStr': '192.168.0.100', 'deviceName': 'agv01', 'type': '1', 'isEnable': 'y', 'codeAct': 'a', 'action': 'b'})
+[2026-06-12 18:11:35][INFO][httptools_impl.py:send:484] 127.0.0.1:52255 - "POST /ygvcs/service/warp/device/addDevice HTTP/1.1" 200
+[2026-06-12 18:12:10][WARNING][device.py:get_device_info:40] 获取设备列表接口入口,参数为：DeviceInfoForm({'userName': 'string', 'userId': 'string'})
+[2026-06-12 18:12:12][INFO][httptools_impl.py:send:484] 127.0.0.1:50621 - "POST /ygvcs/service/warp/device/getDeviceInfo HTTP/1.1" 200
+[2026-06-12 18:13:09][INFO][server.py:shutdown:272] Shutting down
+[2026-06-12 18:13:09][INFO][on.py:shutdown:67] Waiting for application shutdown.
+[2026-06-12 18:13:09][INFO][on.py:shutdown:76] Application shutdown complete.
+[2026-06-12 18:13:09][INFO][server.py:_serve:102] Finished server process [3360]

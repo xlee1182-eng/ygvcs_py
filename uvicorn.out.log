@@ -1,0 +1,7 @@
+INFO:     127.0.0.1:64729 - "GET /ygvcs/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64735 - "GET /ygvcs/docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64736 - "GET /ygvcs/openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64737 - "POST /ygvcs/service/warp/user/userLogin HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60902 - "GET /ygvcs/docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60902 - "GET /ygvcs/openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55406 - "POST /ygvcs/service/warp/device/getDeviceInfo HTTP/1.1" 200 OK
