@@ -127,3 +127,12 @@ class DeviceParamsSetForm(BaseForm):
     haveCargoHeight: float | None = None
 
     _validations = (("deviceImei", "장치 IMEI는 비어있을 수 없습니다"),)
+
+
+class DeviceTrafficInfoForm(BaseForm):
+    """전체 장치 트래픽 정보 조회 (warp/getAllDeviceTrafficInfo)."""
+
+    deviceImei: int | None = None
+    floor: int | None = None
+
+    _validations = (("deviceImei", "장치 IMEI는 비어있을 수 없습니다"),)

@@ -33,11 +33,19 @@ def parse_memory_table(reb: bytes) -> dict:
     battery_level = bp.bytes_to_int(bp.split_byte(reb, 29, 30), 1)
     fork_status = bp.bytes_to_int(bp.split_byte(reb, 30, 31), 1) & 3
     task_flag = (bp.bytes_to_int(bp.split_byte(reb, 31, 32), 1) >> 4) & 0xFF
+    x_position = bp.bytes_to_int(bp.split_byte(reb, 104, 108), 4)
+    y_position = bp.bytes_to_int(bp.split_byte(reb, 108, 112), 4)
+    o_position = bp.bytes_to_int(bp.split_byte(reb, 112, 116), 4)
     self_consistent = bp.bytes_to_int(bp.split_byte(reb, 120, 121), 1)
     lock_state = (self_consistent >> 3) & 1
+    traffic_area_id = bp.bytes_to_int(bp.split_byte(reb, 125, 127), 2)
     button_number = bp.bytes_to_int(bp.split_byte(reb, 127, 129), 2)
+    return_line_id = bp.bytes_to_int(bp.split_byte(reb, 132, 136), 4)
     wifi_strength = bp.bytes_to_int(bp.split_byte(reb, 148, 149), 1)
     floor = bp.bytes_to_int(bp.split_byte(reb, 151, 152), 1)
+    device_no = bp.bytes_to_int(bp.split_byte(reb, 152, 153), 1)
+    control_status = bp.bytes_to_int(bp.split_byte(reb, 153, 154), 1)
+    control_device_no = bp.bytes_to_int(bp.split_byte(reb, 154, 155), 1)
 
     return {
         "deviceImei": imei,
@@ -52,10 +60,18 @@ def parse_memory_table(reb: bytes) -> dict:
         "batteryLevel": battery_level,
         "forkStatus": fork_status,
         "taskFlag": task_flag,
+        "xPosition": x_position,
+        "yPosition": y_position,
+        "oPosition": o_position,
+        "trafficAreaId": traffic_area_id,
+        "returnLineId": return_line_id,
         "lockState": lock_state,
         "buttonNumber": button_number,
         "wifiStrength": wifi_strength,
         "floor": floor,
+        "deviceNo": device_no,
+        "controlStatus": control_status,
+        "controlDeviceNo": control_device_no,
     }
 
 
@@ -75,6 +91,89 @@ def send_heartbeat(imei: int, user_task_id: int, length: int) -> None:
     task = TaskModel()
     task.requestMsg = bp.get_crc_to_send("".join(parts), "123456789")
     send_task_queen(task)
+
+
+async def get_all_device_traffic_info(device_imei: int, floor: int) -> str:
+    """원본 getAllDeviceTrafficInfo: 같은 층의 다른 AGV 위치 정보를 HEX 프레임으로 반환.
+
+    Frame: day(1)+hour(1)+min(1)+sec(1)+ms(2)+count(1)+[deviceNo(1)+returnLineId(4)+
+           xPos(4)+yPos(4)+oPos(4)+trafficAreaId(2)+floor(1)+controlStatus(1)+controlDeviceNo(1)] × N
+    """
+    from datetime import datetime
+
+    keys = await redis_util.wildcard_key(f"{rc.DEVICE_TABLE_PREXFIX}*")
+    if not keys:
+        return ""
+
+    now = datetime.now()
+    header = [
+        bp.print_hex_string(bp.int_to_bytes(now.day, 1)),
+        bp.print_hex_string(bp.int_to_bytes(now.hour, 1)),
+        bp.print_hex_string(bp.int_to_bytes(now.minute, 1)),
+        bp.print_hex_string(bp.int_to_bytes(now.second, 1)),
+        bp.print_hex_string(bp.int_to_bytes(now.microsecond // 1000, 2)),
+    ]
+    device_number = 0
+    device_parts: list[str] = []
+    for key in keys:
+        t = await redis_util.get_str_to_object(key)
+        if t is None:
+            continue
+        if t.get("floor") != floor or t.get("deviceImei") == device_imei:
+            continue
+        device_number += 1
+        device_parts.append(bp.print_hex_string(bp.int_to_bytes(t.get("deviceNo") or 0, 1)))
+        device_parts.append(bp.print_hex_string(bp.int_to_bytes(t.get("returnLineId") or 0, 4)))
+        device_parts.append(bp.print_hex_string(bp.int_to_bytes(t.get("xPosition") or 0, 4)))
+        device_parts.append(bp.print_hex_string(bp.int_to_bytes(t.get("yPosition") or 0, 4)))
+        device_parts.append(bp.print_hex_string(bp.int_to_bytes(t.get("oPosition") or 0, 4)))
+        device_parts.append(bp.print_hex_string(bp.int_to_bytes(t.get("trafficAreaId") or 0, 2)))
+        device_parts.append(bp.print_hex_string(bp.int_to_bytes(t.get("floor") or 0, 1)))
+        device_parts.append(bp.print_hex_string(bp.int_to_bytes(t.get("controlStatus") or 0, 1)))
+        device_parts.append(bp.print_hex_string(bp.int_to_bytes(t.get("controlDeviceNo") or 0, 1)))
+
+    return "".join(header) + bp.print_hex_string(bp.int_to_bytes(device_number, 1)) + "".join(device_parts)
+
+
+async def restart_device_wifi(imei: int, wifi_strength: int) -> None:
+    """원본 restartDeviceWifi: wifi 강도가 임계값 이상(신호 약)이면 재시작 명령 송신.
+
+    10초 TTL 중복 방지 키(WIFI_RESTART_TIME)로 연속 실행을 막는다.
+    FUN_CODES[37] = '54' (wifi 재시작 명령), payload: 01 01
+    """
+    import random
+
+    from app.tcp import constants
+    from app.tcp.tcp_client import TaskModel, send_tcp_msg
+
+    restart_time = await redis_util.get_str_to_object(f"{rc.WIFI_RESTART_TIME}{imei}")
+    if restart_time is not None:
+        return
+
+    restart_value = await redis_util.get_str_to_object(f"{rc.WIFI_RESTART_VALUE}{imei}")
+    if restart_value is None:
+        return
+    try:
+        threshold = int(str(restart_value).strip('"'))
+    except (ValueError, TypeError):
+        return
+    if wifi_strength < threshold:
+        return
+
+    parts = ["40BF807F"]
+    parts.append(bp.print_hex_string(bp.int_to_bytes(random.randint(1, 999999), 4)))
+    parts.append(bp.print_hex_string(bp.int_to_bytes(imei, 4)))
+    parts.append(constants.FUN_CODES[37])
+    parts.append("01")
+    parts.append("01")
+    task = TaskModel()
+    task.funCode = constants.FUN_CODES[37]
+    task.requestMsg = bp.get_crc_to_send("".join(parts), "123456789")
+    result = await send_tcp_msg(task)
+    if result.status:
+        await redis_util.set_to_json(f"{rc.WIFI_RESTART_TIME}{imei}", imei, 10)
+    else:
+        LOGGER.warning("wifi 재시작【%s】명령 응답 실패! %s", imei, result.msg)
 
 
 async def save_or_update_device(reb: bytes) -> dict:

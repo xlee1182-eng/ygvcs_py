@@ -45,6 +45,7 @@ async def _process_heartbeat(frame: bytes) -> None:
     imei = table.get("deviceImei")
 
     # 장치 자동 등록: DB에 없으면 최초 하트비트에서 자동 생성
+    # isEnable="0" = 활성(원본 Java와 동일), "1" = 비활성화
     if imei:
         async with get_sessionmaker()() as db:
             existing = await device_repository.select_by_pk(db, str(imei))
@@ -54,11 +55,8 @@ async def _process_heartbeat(frame: bytes) -> None:
                     device_imei=str(imei),
                     device_name=str(imei),
                     type="1",
-                    flag=table.get("flag", "FF"),
-                    code_act="1",
-                    is_enable="1",
-                    action="1",
-                    created_by="admin",
+                    is_enable="0",
+                    created_by="system",
                     created_date=datetime.now(),
                 )
                 await device_repository.insert(db, entity)
@@ -69,6 +67,13 @@ async def _process_heartbeat(frame: bytes) -> None:
         await user_task_proxy_service.update_task(db, frame)
         await user_task_proxy_service.update_storage_state(db, frame)
         await db.commit()
+
+    # wifi 재시작 체크 (fire-and-forget, 원본 ThreadPool.restartWifi)
+    if imei:
+        from app.services.device_memory_table import restart_device_wifi
+        wifi_strength = table.get("wifiStrength") or 0
+        asyncio.create_task(restart_device_wifi(imei, wifi_strength))
+
     # 유휴 상태면 다음 작업을 픽업해 자동 송신 (자동화 루프 마감)
     if send_task_service.should_dispatch(table):
         async with get_sessionmaker()() as db:

@@ -22,6 +22,7 @@ from app.schemas.device import (
     DeviceInitForm,
     DeviceParamsSetForm,
     DeviceTerminateForm,
+    DeviceTrafficInfoForm,
     DeviceWifiInitForm,
 )
 from app.services.device import device_service
@@ -95,6 +96,21 @@ async def del_device(form: DeviceDelForm, db: AsyncSession = Depends(get_db)) ->
     except Exception:
         # LOGGER.exception("删除设备接口出现异常！")
         LOGGER.exception("장치 삭제 인터페이스 예외 발생!")
+        return JsonResult.syserr()
+
+
+@router.post("/getAllDeviceTrafficInfo", response_model=JsonResult)
+async def get_all_device_traffic_info(form: DeviceTrafficInfoForm) -> JsonResult:
+    try:
+        LOGGER.info("전체 장치 트래픽 정보 조회 인터페이스 진입, 파라미터: %s", form.param_to_string())
+        msg = form.check()
+        if not msg.is_success():
+            return _param_err(msg)
+        from app.services.device_memory_table import get_all_device_traffic_info
+        data = await get_all_device_traffic_info(form.deviceImei, form.floor or 0)
+        return JsonResult.success(data)
+    except Exception:
+        LOGGER.exception("전체 장치 트래픽 정보 조회 인터페이스 예외 발생!")
         return JsonResult.syserr()
 
 
