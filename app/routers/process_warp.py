@@ -16,6 +16,7 @@ from app.core.database import get_db
 from app.core.jsonresult import JsonResult
 from app.schemas.base_form import BaseForm
 from app.schemas.process import (
+    ClearAllDataForm,
     ImportSqlForm,
     IsSyncTaskSourceForm,
     ToPointSwitchSetForm,
@@ -123,4 +124,13 @@ async def get_to_point_time(form: BaseForm) -> JsonResult:
         return JsonResult.success({"toPointTime": time_val})
     except Exception:
         LOGGER.exception("회차점 대기 시간 조회 인터페이스 예외 발생!")
+        return JsonResult.syserr()
+
+
+@router.post("/clearAllData", response_model=JsonResult)
+async def clear_all_data(form: ClearAllDataForm, db: AsyncSession = Depends(get_db)) -> JsonResult:
+    try:
+        return await process_service.clear_all_data(db)
+    except Exception:
+        LOGGER.exception("전체 데이터 삭제 인터페이스 예외 발생!")
         return JsonResult.syserr()

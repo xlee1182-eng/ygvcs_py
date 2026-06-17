@@ -20,7 +20,9 @@ from app.schemas.device import (
     DeviceEditForm,
     DeviceInfoForm,
     DeviceInitForm,
+    DeviceParamsSetForm,
     DeviceTerminateForm,
+    DeviceWifiInitForm,
 )
 from app.services.device import device_service
 
@@ -131,13 +133,39 @@ async def init_location(form: DeviceInitForm, db: AsyncSession = Depends(get_db)
 async def terminate_task(form: DeviceTerminateForm, db: AsyncSession = Depends(get_db)) -> JsonResult:
     """원본 DeviceWebService.terminateTask."""
     try:
-        # LOGGER.warning("终止任务(对外)接口入口,参数为：%s", form.param_to_string())
         LOGGER.info("작업 종료(외부) 인터페이스 진입, 파라미터: %s", form.param_to_string())
         msg = form.check()
         if not msg.is_success():
             return _param_err(msg)
         return await device_service.terminate_task(db, form)
     except Exception:
-        # LOGGER.exception("终止任务(对外)接口出现异常！")
         LOGGER.exception("작업 종료(외부) 인터페이스 예외 발생!")
+        return JsonResult.syserr()
+
+
+@web_router.post("/setWifiRestartValue", response_model=JsonResult)
+async def set_wifi_restart_value(form: DeviceWifiInitForm) -> JsonResult:
+    """원본 DeviceWebService.setWifiRestartValue."""
+    try:
+        LOGGER.info("wifi 재시작 임계값 설정 인터페이스 진입, 파라미터: %s", form.param_to_string())
+        msg = form.check()
+        if not msg.is_success():
+            return _param_err(msg)
+        return await device_service.set_wifi_restart_value(form)
+    except Exception:
+        LOGGER.exception("wifi 재시작 임계값 설정 인터페이스 예외 발생!")
+        return JsonResult.syserr()
+
+
+@web_router.post("/setDeviceParams", response_model=JsonResult)
+async def set_device_params(form: DeviceParamsSetForm) -> JsonResult:
+    """원본 DeviceWebService.setDeviceParams."""
+    try:
+        LOGGER.info("장치 파라미터 설정 인터페이스 진입, 파라미터: %s", form.param_to_string())
+        msg = form.check()
+        if not msg.is_success():
+            return _param_err(msg)
+        return await device_service.set_device_params(form)
+    except Exception:
+        LOGGER.exception("장치 파라미터 설정 인터페이스 예외 발생!")
         return JsonResult.syserr()

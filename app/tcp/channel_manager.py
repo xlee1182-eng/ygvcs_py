@@ -49,11 +49,13 @@ class AgvChannelManager:
         #     return
         if imei and imei not in self._channels:
             self._channels[imei] = writer
+            LOGGER.info("클라이언트 imei=【%s】, ip=【%s】 서버에 연결됐습니다!", imei, ip)
 
     def delete_channel_by_imei(self, imei: int | None) -> None:
         """원본 deleteChannel: 연결 종료 시 매핑 제거."""
         if imei is not None:
             self._channels.pop(imei, None)
+            LOGGER.warning("클라이언트 imei=【%s】 연결이 끊어졌습니다!", imei)
 
     def send_msg(self, msg: str | bytes) -> bool:
         """원본 sendMsg: imei 채널로 프레임 전송."""

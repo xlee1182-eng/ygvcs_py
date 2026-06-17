@@ -170,6 +170,26 @@ class UserTaskRepository(BaseRepository[UserTask]):
         res = await db.execute(stmt)
         return res.scalars().all()
 
+    async def select_all_ordered_desc(
+        self, db: AsyncSession, send_flag: str | None = None
+    ) -> Sequence[UserTask]:
+        """원본 getUserTaskInfo용: 전체(또는 sendFlag 필터) 작업을 user_task_id desc 정렬."""
+        stmt = sa_select(UserTask).order_by(UserTask.user_task_id.desc())
+        if send_flag:
+            stmt = stmt.where(UserTask.send_flag == send_flag)
+        res = await db.execute(stmt)
+        return res.scalars().all()
+
+    async def get_count_task_by_type(
+        self, db: AsyncSession, task_type: str | None = None
+    ) -> Sequence[UserTask]:
+        """원본 getCountTask: send_flag IN ('3','4','7') 작업 집계 (task_type 선택 필터)."""
+        stmt = sa_select(UserTask).where(UserTask.send_flag.in_(["3", "4", "7"]))
+        if task_type:
+            stmt = stmt.where(UserTask.task_type == task_type)
+        res = await db.execute(stmt)
+        return res.scalars().all()
+
 
 task_template_repository = TaskTemplateRepository()
 task_temp_site_repository = TaskTempSiteRepository()

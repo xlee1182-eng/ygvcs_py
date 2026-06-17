@@ -142,4 +142,36 @@ class ProcessService:
         return JsonResult.success()
 
 
+    async def clear_all_data(self, db: AsyncSession) -> JsonResult:
+        """원본 clearAllData: 전체 테이블 데이터 삭제."""
+        from sqlalchemy import text
+
+        tables = [
+            "yg_call_box_info",
+            "yg_device",
+            "yg_forklift_line",
+            "yg_site",
+            "yg_site_area",
+            "yg_site_col",
+            "yg_site_col_info",
+            "yg_site_init_point",
+            "yg_site_manage",
+            "yg_storage",
+            "yg_storage_device_relation",
+            "yg_task_temp_device",
+            "yg_task_temp_site",
+            "yg_task_temp_spare_site",
+            "yg_task_template",
+            "yg_user_task",
+            "yg_user_task_pro",
+        ]
+        for tbl in tables:
+            try:
+                await db.execute(text(f"DELETE FROM {tbl}"))
+            except Exception:
+                pass
+        await db.commit()
+        return JsonResult.success()
+
+
 process_service = ProcessService()

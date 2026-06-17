@@ -375,4 +375,69 @@ class UserTaskService:
         return JsonResult.success()
 
 
+    # ──────────────────────────────────────────────────────────────
+    # UserTaskWarpWebService 추가 엔드포인트
+    # ──────────────────────────────────────────────────────────────
+
+    async def get_user_task_info(self, db: AsyncSession, send_flag: str | None) -> JsonResult:
+        """원본 getUserTaskInfo: 작업 목록 (sendFlag 선택 필터, user_task_id desc)."""
+        rows = await user_task_repository.select_all_ordered_desc(db, send_flag)
+        return JsonResult.success([json_util.to_dict(r) for r in rows])
+
+    async def get_call_device_task(self, db: AsyncSession) -> JsonResult:
+        """원본 getCallDeviceTask: 최신 호출 작업(taskType=4) 1건 반환."""
+        rows = await user_task_repository.select_by_flag_type(db, "1", "4", desc=True)
+        rows2 = await user_task_repository.select_by_flag_type(db, "2", "4", desc=True)
+        all_rows = list(rows) + list(rows2)
+        all_rows.sort(key=lambda r: r.user_task_id, reverse=True)
+        if not all_rows:
+            # 완료된 것 포함해 최신 1건
+            rows3 = await user_task_repository.select_all_ordered_desc(db)
+            all_rows = [r for r in rows3 if r.task_type == "4"]
+        if all_rows:
+            return JsonResult.success(json_util.to_dict(all_rows[0]))
+        return JsonResult.success()
+
+    async def cancel_call_device_task(self, db: AsyncSession, user_name: str | None) -> JsonResult:
+        """원본 cancelCallDeviceTask: 진행중인 호출 작업 취소(또는 종료 명령)."""
+        from app.services.send_task import send_task_service
+
+        rows = await user_task_repository.select_by_flag_type(db, "1", "4", desc=True)
+        rows2 = await user_task_repository.select_by_flag_type(db, "2", "4", desc=True)
+        all_rows = sorted(list(rows) + list(rows2), key=lambda r: r.user_task_id, reverse=True)
+        if not all_rows:
+            return JsonResult.success()
+        t = all_rows[0]
+        if t.send_flag == "2" and t.device_imei:
+            mem = await redis_util.get_str_to_object(f"{rc.DEVICE_TASK_TABLE}{t.device_imei}")
+            if (
+                isinstance(mem, dict)
+                and mem.get("flag") == "85"
+                and mem.get("userTaskId") == t.user_task_id
+            ):
+                return await send_task_service.terminate_task(t.device_imei)
+        if t.send_flag == "3":
+            return JsonResult.fail("1", messages.get_msg("TaskService.cancelCallDeviceTask.callTaskNotCancel2"))
+        t.send_flag = "7"
+        t.updated_by = user_name
+        t.updated_date = datetime.now()
+        await user_task_repository.update_by_pk(db, t)
+        await db.commit()
+        return JsonResult.success()
+
+    async def del_user_task(self, db: AsyncSession, user_task_id: int) -> JsonResult:
+        """원본 delUserTask: 작업 PK 삭제."""
+        await user_task_repository.delete_by_pk(db, user_task_id)
+        await db.commit()
+        return JsonResult.success()
+
+    async def get_count_task(self, db: AsyncSession, task_type: str | None) -> JsonResult:
+        """원본 getCountTask: send_flag IN (3,4,7) 작업을 카운트해 DTO로 반환."""
+        rows = await user_task_repository.get_count_task_by_type(db, task_type)
+        task_over = sum(1 for r in rows if r.send_flag == "3")
+        task_fail = sum(1 for r in rows if r.send_flag == "4")
+        task_cancel = sum(1 for r in rows if r.send_flag == "7")
+        return JsonResult.success({"taskOver": task_over, "taskFail": task_fail, "taskCancel": task_cancel})
+
+
 user_task_service = UserTaskService()

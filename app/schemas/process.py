@@ -20,6 +20,10 @@ class ImportSqlForm(BaseForm):
     data: str | None = None
 
 
+class ClearAllDataForm(BaseForm):
+    """전체 데이터 초기화 (warp/clearAllData). 필수값 없음."""
+
+
 class IsSyncTaskSourceForm(BaseForm):
     """동기화 작업 출처 설정 폼."""
     syncTaskSource: str | None = None

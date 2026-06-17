@@ -59,8 +59,26 @@ def parse_memory_table(reb: bytes) -> dict:
     }
 
 
+def send_heartbeat(imei: int, user_task_id: int, length: int) -> None:
+    """원본 sendHeartbeat: 하트비트 수신 응답 프레임 AGV 로 송신 (fire-and-forget).
+
+    Frame: 40BF807F + userTaskId(4) + imei(4) + "00" + ("00"|"0000") + CRC
+    length <= 137 이면 1바이트 페이로드, 초과면 2바이트.
+    """
+    from app.tcp.tcp_client import TaskModel, send_task_queen
+
+    parts = ["40BF807F"]
+    parts.append(bp.print_hex_string(bp.int_to_bytes(user_task_id, 4)))
+    parts.append(bp.print_hex_string(bp.int_to_bytes(imei, 4)))
+    parts.append("00")
+    parts.append("00" if length <= 137 else "0000")
+    task = TaskModel()
+    task.requestMsg = bp.get_crc_to_send("".join(parts), "123456789")
+    send_task_queen(task)
+
+
 async def save_or_update_device(reb: bytes) -> dict:
-    """원본 saveOrUpdateDevice: 파싱 후 Redis 저장.
+    """원본 saveOrUpdateDevice: 파싱 후 Redis 저장 + 하트비트 응답 송신.
 
     저장:
       - DEVICE_HEART_BEAT+imei = 원본 HEX (3초 TTL)
@@ -72,4 +90,6 @@ async def save_or_update_device(reb: bytes) -> dict:
     await redis_util.set_to_json(f"{rc.DEVICE_HEART_BEAT}{imei}", bp.print_hex_string(reb), 3)
     await redis_util.set_to_str(f"{rc.DEVICE_TABLE_PREXFIX}{imei}", table)
     await redis_util.set_to_str(f"{rc.DEVICE_TASK_TABLE}{imei}", table)
+    length = bp.bytes_to_int(bp.split_byte(reb, 13, 14), 1)
+    send_heartbeat(imei, table["userTaskId"], length)
     return table

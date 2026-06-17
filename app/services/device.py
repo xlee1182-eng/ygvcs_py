@@ -240,5 +240,66 @@ class DeviceService:
             return JsonResult.fail("1", messages.get_msg("device.notConnected"))
         return await send_task_service.terminate_task(form.deviceImei)
 
+    async def set_wifi_restart_value(self, form) -> JsonResult:
+        """원본 setWifiRestartValue: wifi 재시작 임계값을 Redis에 저장."""
+        if form.wifiRestartValue is None:
+            return JsonResult.fail("1", messages.get_msg("device.setWifiRestartValue.wifiRestartValueNotNull"))
+        await redis_util.set_to_str(f"{rc.WIFI_RESTART_VALUE}{form.deviceImei}", form.wifiRestartValue)
+        return JsonResult.success()
+
+    async def set_device_params(self, form) -> JsonResult:
+        """원본 setDeviceParams: 포크리프트 파라미터 프레임 TCP 송신 (FUN_CODES[30]='51').
+
+        palletWidth(tableNo=12,idx=13), noCargoHeight(11,35), liftHeight(11,52), haveCargoHeight(11,43)
+        """
+        import random
+        import struct
+
+        from app.tcp import constants
+        from app.tcp.response_parser import is_0xff_or_0x00
+        from app.tcp.tcp_client import TaskModel, send_tcp_msg
+
+        exit_mem = await redis_util.get_str_to_object(f"{rc.DEVICE_TASK_TABLE}{form.deviceImei}")
+        flag = exit_mem.get("flag") if isinstance(exit_mem, dict) else None
+        if exit_mem is None or flag == "FF":
+            return JsonResult.fail("1", messages.get_msg("device.notConnected"))
+
+        async def _send_param(table_no: int, index: int, value: float) -> JsonResult:
+            parts = ["40BF807F"]
+            msg_no = random.randint(1, 999999)
+            parts.append(bp.print_hex_string(bp.int_to_bytes(msg_no, 4)))
+            parts.append(bp.print_hex_string(bp.int_to_bytes(form.deviceImei, 4)))
+            parts.append(constants.FUN_CODES[30])   # "51"
+            parts.append(bp.print_hex_string(bp.int_to_bytes(7, 2)))
+            parts.append(bp.print_hex_string(bp.int_to_bytes(table_no, 1)))
+            parts.append(bp.print_hex_string(bp.int_to_bytes(index, 2)))
+            parts.append(bp.print_hex_string(struct.pack("<f", value)))  # little-endian float
+            task = TaskModel()
+            task.funCode = constants.FUN_CODES[30]
+            task.requestMsg = bp.get_crc_to_send("".join(parts), "123456789")
+            result = await send_tcp_msg(task)
+            if not result.status:
+                return JsonResult.fail("1", messages.get_msg("TaskService.sendTask.TaskIsFail"))
+            return JsonResult.success()
+
+        if form.palletWidth and form.palletWidth > 0:
+            value = max(800.0, min(3000.0, form.palletWidth))
+            r = await _send_param(12, 13, value)
+            if not r.is_success():
+                return r
+        if form.noCargoHeight and form.noCargoHeight > 0:
+            r = await _send_param(11, 35, form.noCargoHeight)
+            if not r.is_success():
+                return r
+        if form.liftHeight and form.liftHeight > 0:
+            r = await _send_param(11, 52, form.liftHeight)
+            if not r.is_success():
+                return r
+        if form.haveCargoHeight and form.haveCargoHeight > 0:
+            r = await _send_param(11, 43, form.haveCargoHeight)
+            if not r.is_success():
+                return r
+        return JsonResult.success()
+
 
 device_service = DeviceService()

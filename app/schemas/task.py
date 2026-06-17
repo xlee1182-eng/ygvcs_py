@@ -207,3 +207,37 @@ class TaskPointsForm(BaseForm):
         ("deviceImei", "장치 IMEI는 비어있을 수 없습니다"),
         ("startSiteCode", "시작점은 비어있을 수 없습니다"),
     )
+
+
+# ──────────────────────────────────────────────
+# UserTaskWarpWebService 용 추가 폼
+# ──────────────────────────────────────────────
+
+class TaskInfoForm(BaseForm):
+    """작업 목록 조회 (warp/getUserTaskInfo). sendFlag 선택 필터."""
+
+    sendFlag: str | None = None
+
+
+class TaskCallGetForm(BaseForm):
+    """호출 작업 조회 (warp/getCallDeviceTask). 필수값 없음."""
+
+
+class TaskCallCancelForm(BaseForm):
+    """호출 작업 취소 (warp/cancelCallDeviceTask)."""
+
+    userName: str | None = None
+
+
+class TaskDelForm(BaseForm):
+    """작업 삭제 (warp/delUserTask)."""
+
+    userTaskId: int | None = None
+
+    _validations = (("userTaskId", "작업 ID는 비어있을 수 없습니다"),)
+
+
+class TaskCountForm(BaseForm):
+    """작업 통계 (warp/getCountTask). type 선택 필터."""
+
+    type: str | None = None

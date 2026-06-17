@@ -102,3 +102,28 @@ class DeviceInfoDto(BaseModel):
     deviceCamera: list[dict[str, Any]] | None = None
     deviceCall: list[dict[str, Any]] | None = None
     deviceScan: list[dict[str, Any]] | None = None
+
+
+# ──────────────────────────────────────────────
+# DeviceWebService 용 추가 폼 (web_router)
+# ──────────────────────────────────────────────
+
+class DeviceWifiInitForm(BaseForm):
+    """wifi 재시작 임계값 설정 (web/setWifiRestartValue)."""
+
+    deviceImei: int | None = None
+    wifiRestartValue: int | None = None
+
+    _validations = (("deviceImei", "장치 IMEI는 비어있을 수 없습니다"),)
+
+
+class DeviceParamsSetForm(BaseForm):
+    """포크리프트 파라미터 설정 (web/setDeviceParams)."""
+
+    deviceImei: int | None = None
+    palletWidth: float | None = None
+    noCargoHeight: float | None = None
+    liftHeight: float | None = None
+    haveCargoHeight: float | None = None
+
+    _validations = (("deviceImei", "장치 IMEI는 비어있을 수 없습니다"),)

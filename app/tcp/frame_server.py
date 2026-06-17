@@ -36,6 +36,10 @@ class FrameTcpServer:
     async def _handle(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
         peer = writer.get_extra_info("peername")
         ip = peer[0] if peer else ""
+        peer_str = f"{peer[0]}:{peer[1]}" if peer else "unknown"
+        LOGGER.info("%s client login port %s", peer_str, self.port)
+        if self.message_handler is not None:
+            self.message_handler(writer, bytes.fromhex("0F0F0F0F"))
         buf = FrameBuffer()
         imei_seen: int | None = None
         try:
@@ -49,6 +53,7 @@ class FrameTcpServer:
             pass
         finally:
             channel_manager.delete_channel_by_imei(imei_seen)
+            LOGGER.warning("Connection with client IP %s has timed out, connection removed from server %s", peer_str, self.port)
             writer.close()
 
     def _on_frame(self, frame: bytes, writer: asyncio.StreamWriter, ip: str) -> int | None:
@@ -57,6 +62,9 @@ class FrameTcpServer:
             msg_no = bp.bytes_to_int(bp.split_byte(frame, 4, 8), 4)
             imei = bp.bytes_to_int(bp.split_byte(frame, 8, 12), 4)
             fun = bp.print_hex_string(bp.split_byte(frame, 12, 13))
+            flag = bp.print_hex_string(bp.split_byte(frame, 14, 15))
+            start_code = bp.bytes_to_int(bp.split_byte(frame, 15, 18), 3) if fun == "00" else 0
+            end_code = bp.bytes_to_int(bp.split_byte(frame, 18, 21), 3) if fun == "00" else 0
             key = f"{imei}:{fun}:{msg_no}"
             if key in self._doing:
                 self._doing.discard(key)
@@ -66,6 +74,12 @@ class FrameTcpServer:
                 channel_manager.save_channel(writer, frame, ip)
                 if self.message_handler is not None:
                     self.message_handler(writer, frame)
+                
+                # 너무 자세히 찍혀서, 일단 주석처리
+                # LOGGER.warning(
+                #     "imei【:%s】,fun:【%s】,flag:【%s】,msgNo:【%s】,line:【%s-->%s】,frame:%s",
+                #     imei, fun, flag, msg_no, start_code, end_code, bp.print_hex_string(frame),
+                # )
                 if fun != "00":
                     channel_manager.receive_msg(frame, ip)
             finally:
