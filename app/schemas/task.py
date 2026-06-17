@@ -4,7 +4,7 @@
 """
 from __future__ import annotations
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from app.schemas.base_form import BaseForm
 
@@ -119,6 +119,13 @@ class WebTaskAddForm(BaseForm):
     upDownHeight: int | None = None
     taskIsCancel: str | None = None
     taskWayPoints: list[TaskWayPointsForm] | None = None
+
+    @field_validator("taskIsCancel")
+    @classmethod
+    def validate_task_is_cancel(cls, v: str | None) -> str | None:
+        if v is not None and v not in ("0", "1"):
+            raise ValueError("taskIsCancel must be '0' or '1'")
+        return v
 
     # _validations = (("deviceImei", "设备imei不能为空"),)
     _validations = (("deviceImei", "장치 IMEI는 비어있을 수 없습니다"),)
