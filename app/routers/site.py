@@ -19,6 +19,8 @@ from app.schemas.site import (
     AreaStatusEditForm,
     SiteEditForm,
     SiteInfoForm,
+    SiteManageAllForm,
+    SiteManageInfoForm,
     StorageDeviceAddForm,
     StorageDeviceDelForm,
     StorageDeviceInfoForm,
@@ -33,6 +35,8 @@ LOGGER = logging.getLogger('app')
 site_router = APIRouter(prefix="/service/warp/site", tags=["스테이션 관리"])
 # storage_device_router = APIRouter(prefix="/service/warp/storageDevice", tags=["库位设备管理"])
 storage_device_router = APIRouter(prefix="/service/warp/storageDevice", tags=["보관위치 장치 관리"])
+# site_manage_router = APIRouter(prefix="/service/web/siteManage", tags=["对外站点管理"])
+site_manage_router = APIRouter(prefix="/service/web/siteManage", tags=["사이트 관리(web)"])
 
 
 def _param_err(msg: JsonResult) -> JsonResult:
@@ -145,4 +149,29 @@ async def edit_area_status(form: AreaStatusEditForm, db: AsyncSession = Depends(
     except Exception:
         # LOGGER.exception("一键清满库接口出现异常！")
         LOGGER.exception("일괄 창고 정리 인터페이스 예외 발생!")
+        return JsonResult.syserr()
+
+
+@site_manage_router.post("/getAllSite", response_model=JsonResult)
+async def get_all_site(form: SiteManageAllForm, db: AsyncSession = Depends(get_db)) -> JsonResult:
+    """원본 SiteManageWebService.getAllSite: 전체 사이트 조회(외부)."""
+    try:
+        LOGGER.info("전체 사이트 조회(외부) 인터페이스 진입, 파라미터: %s", form.param_to_string())
+        return await storage_service.get_all_site(db, form.customerId)
+    except Exception:
+        LOGGER.exception("전체 사이트 조회(외부) 인터페이스 예외 발생!")
+        return JsonResult.syserr()
+
+
+@site_manage_router.post("/getSiteInfo", response_model=JsonResult)
+async def get_site_manage_info(form: SiteManageInfoForm, db: AsyncSession = Depends(get_db)) -> JsonResult:
+    """원본 SiteManageWebService.getSiteInfo: 현재 사이트 정보 조회(외부)."""
+    try:
+        LOGGER.info("사이트 정보 조회(외부) 인터페이스 진입, 파라미터: %s", form.param_to_string())
+        msg = form.check()
+        if not msg.is_success():
+            return _param_err(msg)
+        return await storage_service.get_site_manage_info(db, form.siteCode)
+    except Exception:
+        LOGGER.exception("사이트 정보 조회(외부) 인터페이스 예외 발생!")
         return JsonResult.syserr()

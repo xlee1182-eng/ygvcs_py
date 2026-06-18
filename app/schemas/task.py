@@ -1,13 +1,19 @@
 """Task 요청 폼/DTO (Pydantic).
 
-원본 webservice.form.task.* 이식 (작업 템플릿 관련).
+원본 webservice.form.task.* 이식.
+- warp 엔드포인트 폼 : BaseForm 상속 (공통 인증 필드 포함)
+- web  엔드포인트 폼 : WebForm 상속 (인증 필드 없음)
 """
 from __future__ import annotations
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel
 
-from app.schemas.base_form import BaseForm
+from app.schemas.base_form import BaseForm, WebForm
 
+
+# ──────────────────────────────────────────────
+# 공유 sub-모델
+# ──────────────────────────────────────────────
 
 class DeviceReg(BaseModel):
     """form.task.DeviceReg — 템플릿에 등록할 장비."""
@@ -27,76 +33,6 @@ class SiteForm(BaseModel):
     standbyList: list["SiteForm"] | None = None
 
 
-class TaskAddForm(BaseForm):
-    """작업 템플릿 추가."""
-
-    taskName: str | None = None
-    startSites: list[SiteForm] = []
-    endSites: list[SiteForm] = []
-    devices: list[DeviceReg] | None = None
-    taskTemplateId: int | None = None
-
-    # _validations = (("taskName", "任务名称不能为空"),)
-    _validations = (("taskName", "작업명은 비어있을 수 없습니다"),)
-
-
-class TaskEditForm(BaseForm):
-    """작업 템플릿 실행상태 수정 / 조회."""
-
-    taskTemplateId: int | None = None
-    runStatus: str | None = None
-
-    # _validations = (("taskTemplateId", "模板id不能为空"),)
-    _validations = (("taskTemplateId", "템플릿 ID는 비어있을 수 없습니다"),)
-
-
-class TaskEditInfoForm(BaseForm):
-    """작업 템플릿 전체 수정(삭제 후 재생성)."""
-
-    taskName: str | None = None
-    taskTemplateId: int | None = None
-    startSites: list[SiteForm] = []
-    endSites: list[SiteForm] = []
-    devices: list[DeviceReg] | None = None
-
-    # _validations = (
-    #     ("taskName", "任务名称不能为空"),
-    #     ("taskTemplateId", "任务id不能为空"),
-    # )
-    _validations = (
-        ("taskName", "작업명은 비어있을 수 없습니다"),
-        ("taskTemplateId", "작업 ID는 비어있을 수 없습니다"),
-    )
-
-
-SiteForm.model_rebuild()
-
-
-class TaskStateGetForm(BaseForm):
-    """작업 상태/취방화 상태 조회 (web)."""
-
-    customerId: str | None = None
-    messageId: str | None = None
-    deviceImei: int | None = None
-
-    # _validations = (("messageId", "消息id不能为空"),)
-    _validations = (("messageId", "메시지 ID는 비어있을 수 없습니다"),)
-
-
-class TaskCancelForm(BaseForm):
-    """미실행 작업 취소 (web)."""
-
-    customerId: str | None = None
-    deviceImei: int | None = None
-
-    # _validations = (("deviceImei", "设备imei不能为空"),)
-    _validations = (("deviceImei", "장치 IMEI는 비어있을 수 없습니다"),)
-
-
-class TaskClearForm(BaseForm):
-    """전체 작업 초기화 (web). 필수값 없음."""
-
-
 class TaskWayPointsForm(BaseModel):
     """form.task.TaskWayPointsForm — 경유점."""
 
@@ -105,88 +41,67 @@ class TaskWayPointsForm(BaseModel):
     storageHeight: int | None = None
 
 
-class WebTaskAddForm(BaseForm):
-    """web/form/task/TaskAddForm — 외부 작업 송신 폼."""
-
-    messageId: str | None = None
-    deviceImei: int | None = None
-    startSiteCode: int | None = None
-    endSiteCode: int | None = None
-    startHandel: str | None = None
-    endHandel: str | None = None
-    startStorageHeight: int | None = None
-    endStorageHeight: int | None = None
-    upDownHeight: int | None = None
-    taskIsCancel: str | None = None
-    taskWayPoints: list[TaskWayPointsForm] | None = None
-
-    @field_validator("taskIsCancel")
-    @classmethod
-    def validate_task_is_cancel(cls, v: str | None) -> str | None:
-        if v is not None and v not in ("0", "1"):
-            raise ValueError("taskIsCancel must be '0' or '1'")
-        return v
-
-    # _validations = (("deviceImei", "设备imei不能为空"),)
-    _validations = (("deviceImei", "장치 IMEI는 비어있을 수 없습니다"),)
+SiteForm.model_rebuild()
 
 
-class KeyboardLockSetForm(BaseForm):
-    """키보드 작업 잠금 설정 (web)."""
+# ──────────────────────────────────────────────
+# warp 엔드포인트 폼 (BaseForm — 인증 필드 포함)
+# ──────────────────────────────────────────────
 
-    customerId: str | None = None
-    deviceImei: int | None = None
-    lockState: int | None = None
+class TaskAddForm(BaseForm):
+    """작업 템플릿 추가 (warp/addTaskTemp)."""
 
-    # _validations = (
-    #     ("deviceImei", "设备imei不能为空"),
-    #     ("lockState", "锁状态不能为空"),
-    # )
+    taskName: str | None = None
+    startSites: list[SiteForm] = []
+    endSites: list[SiteForm] = []
+    devices: list[DeviceReg] | None = None
+    taskTemplateId: int | None = None
+
+    _validations = (("taskName", "작업명은 비어있을 수 없습니다"),)
+
+
+class TaskEditForm(BaseForm):
+    """작업 템플릿 수정/삭제/조회 (warp/editTaskTemp·delTaskTemp·selectTaskTempInfo)."""
+
+    taskTemplateId: int | None = None
+    runStatus: str | None = None
+
+    _validations = (("taskTemplateId", "템플릿 ID는 비어있을 수 없습니다"),)
+
+
+class TaskEditInfoForm(BaseForm):
+    """작업 템플릿 전체 수정 (warp/editTaskTempInfo)."""
+
+    taskName: str | None = None
+    taskTemplateId: int | None = None
+    startSites: list[SiteForm] = []
+    endSites: list[SiteForm] = []
+    devices: list[DeviceReg] | None = None
+
     _validations = (
-        ("deviceImei", "장치 IMEI는 비어있을 수 없습니다"),
-        ("lockState", "잠금 상태는 비어있을 수 없습니다"),
+        ("taskName", "작업명은 비어있을 수 없습니다"),
+        ("taskTemplateId", "작업 ID는 비어있을 수 없습니다"),
     )
 
 
-class TaskSetForm(BaseForm):
-    """작업 설정(시작/일시정지/종료) (web)."""
-
-    customerId: str | None = None
-    messageId: str | None = None
-    taskState: str | None = None
-    deviceImei: int | None = None
-
-    # _validations = (
-    #     ("messageId", "消息id不能为空"),
-    #     ("taskState", "任务状态不能为空"),
-    # )
-    _validations = (
-        ("messageId", "메시지 ID는 비어있을 수 없습니다"),
-        ("taskState", "작업 상태는 비어있을 수 없습니다"),
-    )
+class TaskClearTempForm(BaseForm):
+    """작업 템플릿 전체 초기화 (warp/clearTaskTemp). 필수값 없음."""
 
 
-class TaskRepeatSendForm(BaseForm):
-    """작업 반복 송신 (web)."""
+class TaskSelectListForm(BaseForm):
+    """작업 템플릿 목록 조회 (warp/selectTaskTempList)."""
 
-    messageId: str | None = None
-
-    # _validations = (("messageId", "消息id不能为空"),)
-    _validations = (("messageId", "메시지 ID는 비어있을 수 없습니다"),)
+    taskTemplateId: int | None = None
 
 
 class TaskCallForm(BaseForm):
-    """form.task.TaskCallForm — 장비 호출(차량 요청) 작업 — DB 생성."""
+    """장비 호출 작업 (warp/callDeviceTask)."""
 
     deviceImei: str | None = None
     siteCode: int | None = None
     startHandel: str | None = None
     callType: str | None = None
 
-    # _validations = (
-    #     ("siteCode", "呼叫点不能为空"),
-    #     ("callType", "叫车类型不能为空"),
-    # )
     _validations = (
         ("siteCode", "호출 지점은 비어있을 수 없습니다"),
         ("callType", "차량 호출 유형은 비어있을 수 없습니다"),
@@ -194,7 +109,7 @@ class TaskCallForm(BaseForm):
 
 
 class TaskPointsForm(BaseForm):
-    """점대점 작업 송신."""
+    """점대점 작업 송신 (warp/sendPointsTask)."""
 
     deviceImei: int | None = None
     startSiteCode: int | None = None
@@ -206,19 +121,11 @@ class TaskPointsForm(BaseForm):
     startHandel: str | None = None
     endHandel: str | None = None
 
-    # _validations = (
-    #     ("deviceImei", "设备imei不能为空"),
-    #     ("startSiteCode", "起点不能为空"),
-    # )
     _validations = (
         ("deviceImei", "장치 IMEI는 비어있을 수 없습니다"),
         ("startSiteCode", "시작점은 비어있을 수 없습니다"),
     )
 
-
-# ──────────────────────────────────────────────
-# UserTaskWarpWebService 용 추가 폼
-# ──────────────────────────────────────────────
 
 class TaskInfoForm(BaseForm):
     """작업 목록 조회 (warp/getUserTaskInfo). sendFlag 선택 필터."""
@@ -231,9 +138,7 @@ class TaskCallGetForm(BaseForm):
 
 
 class TaskCallCancelForm(BaseForm):
-    """호출 작업 취소 (warp/cancelCallDeviceTask)."""
-
-    userName: str | None = None
+    """호출 작업 취소 (warp/cancelCallDeviceTask). userName은 BaseForm 공유."""
 
 
 class TaskDelForm(BaseForm):
@@ -248,3 +153,83 @@ class TaskCountForm(BaseForm):
     """작업 통계 (warp/getCountTask). type 선택 필터."""
 
     type: str | None = None
+
+
+# ──────────────────────────────────────────────
+# web 엔드포인트 폼 (WebForm — 인증 필드 없음)
+# ──────────────────────────────────────────────
+
+class WebTaskAddForm(WebForm):
+    """web/sendTask — 외부 작업 송신 폼."""
+
+    messageId: str | None = None
+    deviceImei: int | None = None
+    startSiteCode: int | None = None
+    endSiteCode: int | None = None
+    startHandel: str | None = None
+    endHandel: str | None = None
+    startStorageHeight: int | None = None
+    endStorageHeight: int | None = None
+    upDownHeight: int | None = None
+    taskIsCancel: str | None = None
+    taskWayPoints: list[TaskWayPointsForm] | None = None
+
+    _validations = (("deviceImei", "장치 IMEI는 비어있을 수 없습니다"),)
+
+
+class TaskStateGetForm(WebForm):
+    """작업 상태/취방화 상태 조회 (web/getTaskResult·getPickPlaceState)."""
+
+    customerId: str | None = None
+    messageId: str | None = None
+    deviceImei: int | None = None
+
+    _validations = (("messageId", "메시지 ID는 비어있을 수 없습니다"),)
+
+
+class TaskCancelForm(WebForm):
+    """미실행 작업 취소 (web/cancelTask)."""
+
+    customerId: str | None = None
+    deviceImei: int | None = None
+
+    _validations = (("deviceImei", "장치 IMEI는 비어있을 수 없습니다"),)
+
+
+class TaskClearForm(WebForm):
+    """전체 작업 초기화 (web/clearTask). 필수값 없음."""
+
+
+class KeyboardLockSetForm(WebForm):
+    """키보드 작업 잠금 설정 (web/setKeyboardLock)."""
+
+    customerId: str | None = None
+    deviceImei: int | None = None
+    lockState: int | None = None
+
+    _validations = (
+        ("deviceImei", "장치 IMEI는 비어있을 수 없습니다"),
+        ("lockState", "잠금 상태는 비어있을 수 없습니다"),
+    )
+
+
+class TaskSetForm(WebForm):
+    """작업 설정(시작/일시정지/종료) (web/setTask)."""
+
+    customerId: str | None = None
+    messageId: str | None = None
+    taskState: str | None = None
+    deviceImei: int | None = None
+
+    _validations = (
+        ("messageId", "메시지 ID는 비어있을 수 없습니다"),
+        ("taskState", "작업 상태는 비어있을 수 없습니다"),
+    )
+
+
+class TaskRepeatSendForm(WebForm):
+    """작업 반복 송신 (web/sendRepeatTask)."""
+
+    messageId: str | None = None
+
+    _validations = (("messageId", "메시지 ID는 비어있을 수 없습니다"),)

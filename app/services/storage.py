@@ -18,6 +18,7 @@ from app.core.jsonresult import JsonResult
 from app.models.tables import Storage, StorageDeviceRelation
 from app.repositories.device import device_repository
 from app.repositories.site import (
+    site_manage_repository,
     storage_device_relation_repo,
     storage_repository,
 )
@@ -246,6 +247,19 @@ class StorageService:
         return await self.edit_storage_status(
             db, form.deviceImei, form.deviceType, form.siteCode, site_status, action_type
         )
+
+
+    async def get_all_site(self, db: AsyncSession, customer_id: str | None) -> JsonResult:
+        """원본 SiteManageWebService.getAllSite: 전체 사이트 조회(외부)."""
+        rows = await site_manage_repository.select(db, {"customer_id": customer_id} if customer_id else None)
+        return JsonResult.success([json_util.to_dict(r) for r in rows])
+
+    async def get_site_manage_info(self, db: AsyncSession, site_code: int) -> JsonResult:
+        """원본 SiteManageWebService.getSiteInfo: 현재 사이트 정보 조회(외부)."""
+        rows = await site_manage_repository.select(db, {"site_code": site_code})
+        if not rows:
+            return JsonResult.fail("1", messages.get_msg("site.editStorageStatus.noStorage"))
+        return JsonResult.success(json_util.to_dict(rows[0]))
 
 
 class StorageDeviceRelationService:

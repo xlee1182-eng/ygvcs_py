@@ -120,17 +120,18 @@ _sub = FastAPI(
 async def health() -> dict:
     return {"status": "UP", "app": settings.app_name, "version": settings.server_version}
 
+# _sub.include_router(process_warp.router)
 
-_sub.include_router(user.router)
-_sub.include_router(device.router)
+# _sub.include_router(user.router)
+# _sub.include_router(device.router)
 _sub.include_router(device.web_router)
-_sub.include_router(site.site_router)
-_sub.include_router(site.storage_device_router)
-_sub.include_router(task.router)
+# _sub.include_router(site.site_router)
+# _sub.include_router(site.storage_device_router)
+_sub.include_router(site.site_manage_router)
+# _sub.include_router(task.router)
 _sub.include_router(user_task.router)
-_sub.include_router(user_task_warp.router)
-_sub.include_router(process_warp.router)
-_sub.include_router(forklift_line.router)
+# _sub.include_router(user_task_warp.router)
+# _sub.include_router(forklift_line.router)
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
 app.mount(settings.context_path, _sub)

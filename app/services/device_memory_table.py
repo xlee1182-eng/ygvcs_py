@@ -37,10 +37,12 @@ def parse_memory_table(reb: bytes) -> dict:
     y_position = bp.bytes_to_int(bp.split_byte(reb, 108, 112), 4)
     o_position = bp.bytes_to_int(bp.split_byte(reb, 112, 116), 4)
     self_consistent = bp.bytes_to_int(bp.split_byte(reb, 120, 121), 1)
+    storage_row_flag = (self_consistent >> 1) & 2   # Java storageRowFlag (库位列状态)
     lock_state = (self_consistent >> 3) & 1
     traffic_area_id = bp.bytes_to_int(bp.split_byte(reb, 125, 127), 2)
     button_number = bp.bytes_to_int(bp.split_byte(reb, 127, 129), 2)
     return_line_id = bp.bytes_to_int(bp.split_byte(reb, 132, 136), 4)
+    task_source = bp.bytes_to_int(bp.split_byte(reb, 137, 138), 1)  # Java taskSource (任务来源)
     wifi_strength = bp.bytes_to_int(bp.split_byte(reb, 148, 149), 1)
     floor = bp.bytes_to_int(bp.split_byte(reb, 151, 152), 1)
     device_no = bp.bytes_to_int(bp.split_byte(reb, 152, 153), 1)
@@ -60,6 +62,8 @@ def parse_memory_table(reb: bytes) -> dict:
         "batteryLevel": battery_level,
         "forkStatus": fork_status,
         "taskFlag": task_flag,
+        "taskSource": task_source,
+        "storageRowFlag": storage_row_flag,
         "xPosition": x_position,
         "yPosition": y_position,
         "oPosition": o_position,
@@ -186,6 +190,26 @@ async def save_or_update_device(reb: bytes) -> dict:
     """
     table = parse_memory_table(reb)
     imei = table["deviceImei"]
+    # LOGGER.warning(
+    #     "imei【%s】,userTaskId=【%s】，任务状态为【%s】，任务来源【%s】，键盘锁状态为【%s】，货叉状态为【%s】，库位列状态为【%s】",
+    #     imei,
+    #     table["userTaskId"],
+    #     table["taskFlag"],
+    #     table["taskSource"],
+    #     table["lockState"],
+    #     table["forkStatus"],
+    #     table["storageRowFlag"],
+    # )
+    LOGGER.warning(
+        "imei[%s] userTaskId[%s] 작업상태[%s] 작업출처[%s] 키락[%s] 포크상태[%s] 컬럼포인트상태[%s]",
+        imei,
+        table["userTaskId"],
+        table["taskFlag"],
+        table["taskSource"],
+        table["lockState"],
+        table["forkStatus"],
+        table["storageRowFlag"],
+    )
     await redis_util.set_to_json(f"{rc.DEVICE_HEART_BEAT}{imei}", bp.print_hex_string(reb), 3)
     await redis_util.set_to_str(f"{rc.DEVICE_TABLE_PREXFIX}{imei}", table)
     await redis_util.set_to_str(f"{rc.DEVICE_TASK_TABLE}{imei}", table)

@@ -15,7 +15,7 @@ from app.core import messages
 from app.core.database import get_db
 from app.core.jsonresult import JsonResult
 from app.repositories.task import task_template_repository
-from app.schemas.task import TaskAddForm, TaskEditForm, TaskEditInfoForm
+from app.schemas.task import TaskAddForm, TaskClearTempForm, TaskEditForm, TaskEditInfoForm, TaskSelectListForm
 from app.services.task import task_service
 from app.utils import json_util
 
@@ -82,7 +82,7 @@ async def del_task_temp(form: TaskEditForm, db: AsyncSession = Depends(get_db)) 
 
 
 @router.post("/clearTaskTemp", response_model=JsonResult)
-async def clear_task_temp(db: AsyncSession = Depends(get_db)) -> JsonResult:
+async def clear_task_temp(form: TaskClearTempForm, db: AsyncSession = Depends(get_db)) -> JsonResult:
     """원본 clearTaskTemp: 전체 템플릿을 순회하며 삭제."""
     try:
         templates = await task_template_repository.select_all(db)
@@ -91,13 +91,12 @@ async def clear_task_temp(db: AsyncSession = Depends(get_db)) -> JsonResult:
             msg = await task_service.del_task_temp(db, TaskEditForm(taskTemplateId=t.task_template_id))
         return msg
     except Exception:
-        # LOGGER.exception("清空任务模板接口出现异常！")
         LOGGER.exception("작업 템플릿 전체 초기화 인터페이스 예외 발생!")
         return JsonResult.syserr()
 
 
 @router.post("/selectTaskTempList", response_model=JsonResult)
-async def select_task_temp_list(db: AsyncSession = Depends(get_db)) -> JsonResult:
+async def select_task_temp_list(form: TaskSelectListForm, db: AsyncSession = Depends(get_db)) -> JsonResult:
     """원본 selectTaskTempList: 템플릿 목록 조회."""
     try:
         templates = await task_template_repository.select_all(db)
@@ -105,7 +104,6 @@ async def select_task_temp_list(db: AsyncSession = Depends(get_db)) -> JsonResul
         msg.data = [json_util.to_dict(t) for t in templates]
         return msg
     except Exception:
-        # LOGGER.exception("查询任务模板列表接口出现异常！")
         LOGGER.exception("작업 템플릿 목록 조회 인터페이스 예외 발생!")
         return JsonResult.syserr()
 

@@ -75,11 +75,11 @@ class FrameTcpServer:
                 if self.message_handler is not None:
                     self.message_handler(writer, frame)
                 
-                # 너무 자세히 찍혀서, 일단 주석처리
-                # LOGGER.warning(
-                #     "imei【:%s】,fun:【%s】,flag:【%s】,msgNo:【%s】,line:【%s-->%s】,frame:%s",
-                #     imei, fun, flag, msg_no, start_code, end_code, bp.print_hex_string(frame),
-                # )
+                LOGGER.warning(
+                    # "imei【:%s】,fun:【%s】,flag:【%s】,msgNo:【%s】,line:【%s-->%s】,frame:%s",
+                    "imei[%s] fun[%s] flag[%s] msgNo[%s] line[%s-->%s] frame[%s]",
+                    imei, fun, flag, msg_no, start_code, end_code, bp.print_hex_string(frame),
+                )
                 if fun != "00":
                     channel_manager.receive_msg(frame, ip)
             finally:

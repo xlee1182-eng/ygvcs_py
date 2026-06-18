@@ -247,6 +247,18 @@ class DeviceService:
         await redis_util.set_to_str(f"{rc.WIFI_RESTART_VALUE}{form.deviceImei}", form.wifiRestartValue)
         return JsonResult.success()
 
+    async def get_web_device_info(self, device_imei: int) -> JsonResult:
+        """원본 DeviceWebService.getDeviceInfo: 장치 상태 조회(외부)."""
+        mem = await redis_util.get_str_to_object(f"{rc.DEVICE_TASK_TABLE}{device_imei}")
+        if mem is None:
+            return JsonResult.fail("1", messages.get_msg("device.getDevice.noDevice"))
+        return JsonResult.success(mem)
+
+    async def get_web_device_list(self, db: AsyncSession) -> JsonResult:
+        """원본 DeviceWebService.getDeviceList: 장치 목록 조회(외부)."""
+        devices = await device_repository.select_all(db)
+        return JsonResult.success([_device_dict(d) for d in devices])
+
     async def set_device_params(self, form) -> JsonResult:
         """원본 setDeviceParams: 포크리프트 파라미터 프레임 TCP 송신 (FUN_CODES[30]='51').
 
