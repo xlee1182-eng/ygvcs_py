@@ -26,7 +26,7 @@ class FrameTcpServer:
 
     async def start(self) -> None:
         self._server = await asyncio.start_server(self._handle, host="0.0.0.0", port=self.port)
-        LOGGER.info("%s 시작, 포트: %s", self.name, self.port)
+        LOGGER.info("%s Start, Port: %s", self.name, self.port)
 
     async def stop(self) -> None:
         if self._server is not None:

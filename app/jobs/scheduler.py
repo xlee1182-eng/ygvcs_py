@@ -23,9 +23,11 @@ def start_scheduler() -> AsyncIOScheduler:
         return _scheduler
     _scheduler = AsyncIOScheduler()
     # 원본 RecordHeartJob: 운영 플래그 주기 갱신
-    _scheduler.add_job(record_heart_job.execute, "interval", seconds=5, id="record_heart", max_instances=3, coalesce=True)
+    _job_id = "record_heart_job"
+    _interval = 5
+    _scheduler.add_job(record_heart_job.execute, "interval", seconds=_interval, id=_job_id, max_instances=3, coalesce=True)
     _scheduler.start()
-    LOGGER.info("스케줄러 시작 (record_heart 5s)")
+    LOGGER.info("[Scheduler] %s — 매 %d초마다 실행", _job_id, _interval)
     return _scheduler
 
 

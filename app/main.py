@@ -29,9 +29,21 @@ for _name in ("uvicorn", "uvicorn.error", "uvicorn.access"):
     _uv.propagate = False
 
 
+async def _check_mysql() -> None:
+    from sqlalchemy import text
+    from app.core.database import get_engine
+    LOGGER.info("[MySQL] 연결중... %s:%s  db=%s", settings.db_host, settings.db_port, settings.db_name)
+    try:
+        async with get_engine().connect() as conn:
+            await conn.execute(text("SELECT 1"))
+        LOGGER.info("[MySQL] 연결 OK")
+    except Exception as e:
+        LOGGER.error("[MySQL] 연결 실패: %s", e)
+
+
 async def _check_redis() -> None:
     import redis.asyncio as aioredis
-    LOGGER.info("[Redis] 연결 시도 중... %s:%s  db=%s", settings.redis_host, settings.redis_port, settings.redis_db)
+    LOGGER.info("[Redis] 연결중... %s:%s  db=%s", settings.redis_host, settings.redis_port, settings.redis_db)
     client = aioredis.Redis(
         host=settings.redis_host,
         port=settings.redis_port,
@@ -60,7 +72,7 @@ async def _init_redis_data() -> None:
 
     # 1. communication_key
     await redis_util.set_to_str(rc.COMMUN_KEY_PREXFIX, settings.communication_key)
-    LOGGER.info("[Redis 초기화] communication_key = %s", settings.communication_key)
+    LOGGER.info("[Redis] communication_key = %s", settings.communication_key)
 
     # 2. forklift_all — DB에서 전체 노선 로드
     try:
@@ -69,17 +81,18 @@ async def _init_redis_data() -> None:
             lines = res.scalars().all()
         line_list = [json_util.to_dict(l) for l in lines]
         await redis_util.set_to_str(rc.FORKLIFT_ALL, line_list)
-        LOGGER.info("[Redis 초기화] forklift_all  (%d건)", len(line_list))
+        LOGGER.info("[Redis] forklift_all  (%d건)", len(line_list))
     except Exception as e:
-        LOGGER.error("[Redis 초기화] forklift_all 실패: %s", e)
+        LOGGER.error("[Redis] forklift_all 실패: %s", e)
 
     # 3. serverIsReady
     await redis_util.set_to_str("serverIsReady", "yes")
-    LOGGER.info("[Redis 초기화] serverIsReady = yes")
+    LOGGER.info("[Redis] serverIsReady = yes")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await _check_mysql()
     await _check_redis()
     await _init_redis_data()
     # 차량(AGV) TCP 서버 기동 (원본 PrimaryNettyServer)

@@ -80,12 +80,19 @@ class RedisUtil:
         cls 가 str 이면 원시 문자열 반환, Pydantic 이면 모델, 그 외엔 dict.
         """
         try:
-            json_str = await _redis().get(key)
+            json_str = await _redis().get(key) # Redis에서 키 값을 문자열로 읽어옴
+
+            # cls 가 str 이면 원시 문자열 반환 
+            # getattr(cls, "__name__", "").lower() == "string" 부분은 
+            # 원본 Java의 String.class를 넘기던 패턴을 방어적으로 처리한 흔적인데, Python에서는 사실상 쓸 일 없는 코드입니다
             if cls is str or (cls is not None and getattr(cls, "__name__", "").lower() == "string"):
                 return json_str
+            
+            # cls가 Pydantic 모델이면 → JSON 문자열을 파싱해서 모델 인스턴스로 변환
             return json_util.to_object(json_str, cls if cls and hasattr(cls, "model_validate") else None)
+        
         except Exception:
-            return None
+            return None # 키가 없으면 None
 
     async def wildcard_key(self, pattern: str) -> set[str]:
         """원본 wildcardKey: KEYS 패턴."""

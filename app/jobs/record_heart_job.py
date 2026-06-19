@@ -11,11 +11,11 @@ from app.utils.redis_util import redis_util
 class RecordHeart:
     """원본 RecordHeartJob 의 정적 플래그 묶음."""
 
-    record_heart: bool = True
+    record_heart: bool = False
     turn_on_station: bool = False
     server_is_ready: bool = False
     open_traffic: bool = False
-    storage_not_turn_round: bool = True
+    storage_not_turn_round: bool = False
 
 
 async def execute() -> None:
@@ -27,4 +27,10 @@ async def execute() -> None:
     RecordHeart.open_traffic = (await redis_util.get_str_to_object("is.open.traffic", str)) == "on"
     RecordHeart.storage_not_turn_round = (await redis_util.get_str_to_object("stotage.is.turn.round", str)) == "on"
 
-    # print("스케줄러(record_heart 5s)")
+    # print("스케줄러(record_heart 5s) 갱신: record_heart=%s, turn_on_station=%s, server_is_ready=%s, open_traffic=%s, storage_not_turn_round=%s" % (
+    #     RecordHeart.record_heart,
+    #     RecordHeart.turn_on_station,
+    #     RecordHeart.server_is_ready,
+    #     RecordHeart.open_traffic,
+    #     RecordHeart.storage_not_turn_round,
+    # ))
