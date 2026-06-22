@@ -182,7 +182,7 @@ class TaskStateGetForm(WebForm):
 
     customerId: str | None = None
     messageId: str | None = None
-    deviceImei: int | None = None
+    # deviceImei: int | None = None
 
     _validations = (("messageId", "메시지 ID는 비어있을 수 없습니다"),)
 
@@ -190,7 +190,7 @@ class TaskStateGetForm(WebForm):
 class TaskCancelForm(WebForm):
     """미실행 작업 취소 (web/cancelTask)."""
 
-    customerId: str | None = None
+    # customerId: str | None = None
     deviceImei: int | None = None
 
     _validations = (("deviceImei", "장치 IMEI는 비어있을 수 없습니다"),)
@@ -203,7 +203,7 @@ class TaskClearForm(WebForm):
 class KeyboardLockSetForm(WebForm):
     """키보드 작업 잠금 설정 (web/setKeyboardLock)."""
 
-    customerId: str | None = None
+    # customerId: str | None = None
     deviceImei: int | None = None
     lockState: int | None = None
 
@@ -216,10 +216,10 @@ class KeyboardLockSetForm(WebForm):
 class TaskSetForm(WebForm):
     """작업 설정(시작/일시정지/종료) (web/setTask)."""
 
-    customerId: str | None = None
+    # customerId: str | None = None
     messageId: str | None = None
     taskState: str | None = None
-    deviceImei: int | None = None
+    # deviceImei: int | None = None
 
     _validations = (
         ("messageId", "메시지 ID는 비어있을 수 없습니다"),

@@ -133,18 +133,20 @@ _sub = FastAPI(
 async def health() -> dict:
     return {"status": "UP", "app": settings.app_name, "version": settings.server_version}
 
-# _sub.include_router(process_warp.router)
+# _sub.include_router(process_warp.router) # /service/warp/process
+# _sub.include_router(user.router) # /service/warp/user
+# _sub.include_router(device.router) # /service/warp/device
+# _sub.include_router(site.site_router) # /service/warp/site
+# _sub.include_router(site.storage_device_router) # /service/warp/storageDevice
+# _sub.include_router(task.router) # /service/warp/task
+# _sub.include_router(user_task_warp.router) # /service/warp/userTask
 
-# _sub.include_router(user.router)
-# _sub.include_router(device.router)
-_sub.include_router(device.web_router)
-# _sub.include_router(site.site_router)
-# _sub.include_router(site.storage_device_router)
-_sub.include_router(site.site_manage_router)
-# _sub.include_router(task.router)
-_sub.include_router(user_task.router)
-# _sub.include_router(user_task_warp.router)
-# _sub.include_router(forklift_line.router)
+
+_sub.include_router(device.web_router) # /service/web/device
+_sub.include_router(user_task.router) # /service/web/userTask
+_sub.include_router(site.site_manage_router) # /service/web/siteManage
+_sub.include_router(forklift_line.router) # /service/web/forkliftLine
+
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
 app.mount(settings.context_path, _sub)

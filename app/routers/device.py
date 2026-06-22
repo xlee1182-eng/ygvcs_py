@@ -46,6 +46,7 @@ async def get_device_info(form: DeviceInfoForm, db: AsyncSession = Depends(get_d
         LOGGER.warning("getDeviceInfo ->: %s", form.model_dump_json())
         msg = form.check()
         if not msg.is_success():
+            LOGGER.warning("getDeviceInfo <-: %s", msg.model_dump_json())
             return _param_err(msg)
         result = await device_service.get_device_info(db, form)
         LOGGER.warning("getDeviceInfo <-: %s", result.model_dump_json())
@@ -62,6 +63,7 @@ async def add_device(form: DeviceAddForm, db: AsyncSession = Depends(get_db)) ->
         LOGGER.warning("addDevice ->: %s", form.model_dump_json())
         msg = form.check()
         if not msg.is_success():
+            LOGGER.warning("addDevice <-: %s", msg.model_dump_json())
             return _param_err(msg)
         result = await device_service.add_device(db, form)
         LOGGER.warning("addDevice <-: %s", result.model_dump_json())
@@ -78,6 +80,7 @@ async def edit_device(form: DeviceEditForm, db: AsyncSession = Depends(get_db)) 
         LOGGER.warning("editDevice ->: %s", form.model_dump_json())
         msg = form.check()
         if not msg.is_success():
+            LOGGER.warning("editDevice <-: %s", msg.model_dump_json())
             return _param_err(msg)
         result = await device_service.edit_device(db, form)
         LOGGER.warning("editDevice <-: %s", result.model_dump_json())
@@ -94,6 +97,7 @@ async def del_device(form: DeviceDelForm, db: AsyncSession = Depends(get_db)) ->
         LOGGER.warning("delDevice ->: %s", form.model_dump_json())
         msg = form.check()
         if not msg.is_success():
+            LOGGER.warning("delDevice <-: %s", msg.model_dump_json())
             return _param_err(msg)
         result = await device_service.del_device(db, form)
         LOGGER.warning("delDevice <-: %s", result.model_dump_json())
@@ -110,6 +114,7 @@ async def get_all_device_traffic_info(form: DeviceTrafficInfoForm) -> JsonResult
         LOGGER.warning("getAllDeviceTrafficInfo ->: %s", form.model_dump_json())
         msg = form.check()
         if not msg.is_success():
+            LOGGER.warning("getAllDeviceTrafficInfo <-: %s", msg.model_dump_json())
             return _param_err(msg)
         from app.services.device_memory_table import get_all_device_traffic_info
         data = await get_all_device_traffic_info(form.deviceImei, form.floor or 0)
@@ -127,6 +132,7 @@ async def get_agv_heart_list(form: DeviceInfoForm) -> JsonResult:
         LOGGER.warning("getAgvHeartList ->: %s", form.model_dump_json())
         msg = form.check()
         if not msg.is_success():
+            LOGGER.warning("getAgvHeartList <-: %s", msg.model_dump_json())
             return _param_err(msg)
         result = await device_service.get_agv_heart_list(form)
         LOGGER.warning("getAgvHeartList <-: %s", result.model_dump_json())
@@ -144,6 +150,7 @@ async def init_location(form: DeviceInitForm, db: AsyncSession = Depends(get_db)
         LOGGER.warning("initLocation ->: %s", form.model_dump_json())
         msg = form.check()
         if not msg.is_success():
+            LOGGER.warning("initLocation <-: %s", msg.model_dump_json())
             return _param_err(msg)
         result = await device_service.init_location(db, form)
         LOGGER.warning("initLocation <-: %s", result.model_dump_json())
@@ -161,6 +168,7 @@ async def terminate_task(form: DeviceTerminateForm, db: AsyncSession = Depends(g
         LOGGER.warning("terminateTask ->: %s", form.model_dump_json())
         msg = form.check()
         if not msg.is_success():
+            LOGGER.warning("terminateTask <-: %s", msg.model_dump_json())
             return _param_err(msg)
         result = await device_service.terminate_task(db, form)
         LOGGER.warning("terminateTask <-: %s", result.model_dump_json())
@@ -177,6 +185,7 @@ async def set_wifi_restart_value(form: DeviceWifiInitForm) -> JsonResult:
         LOGGER.warning("setWifiRestartValue ->: %s", form.model_dump_json())
         msg = form.check()
         if not msg.is_success():
+            LOGGER.warning("setWifiRestartValue <-: %s", msg.model_dump_json())
             return _param_err(msg)
         result = await device_service.set_wifi_restart_value(form)
         LOGGER.warning("setWifiRestartValue <-: %s", result.model_dump_json())
@@ -193,6 +202,7 @@ async def web_get_device_info(form: DeviceWebInfoForm) -> JsonResult:
         LOGGER.warning("web/getDeviceInfo ->: %s", form.model_dump_json())
         msg = form.check()
         if not msg.is_success():
+            LOGGER.warning("web/getDeviceInfo <-: %s", msg.model_dump_json())
             return _param_err(msg)
         result = await device_service.get_web_device_info(form.deviceImei)
         LOGGER.warning("web/getDeviceInfo <-: %s", result.model_dump_json())
@@ -222,6 +232,7 @@ async def set_device_params(form: DeviceParamsSetForm) -> JsonResult:
         LOGGER.warning("setDeviceParams ->: %s", form.model_dump_json())
         msg = form.check()
         if not msg.is_success():
+            LOGGER.warning("setDeviceParams <-: %s", msg.model_dump_json())
             return _param_err(msg)
         result = await device_service.set_device_params(form)
         LOGGER.warning("setDeviceParams <-: %s", result.model_dump_json())

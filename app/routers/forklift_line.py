@@ -20,7 +20,7 @@ router = APIRouter(prefix="/service/web/forkliftLine", tags=["노선 관리"])
 class ForkliftLineAllForm(WebForm):
     """전체 노선 조회(외부) — customerId 선택."""
 
-    customerId: str | None = None
+    # customerId: str | None = None
 
 
 @router.post("/getAllForkliftLine", response_model=JsonResult)
